@@ -293,12 +293,12 @@ if monthly_probs is not None and not monthly_probs.empty:
             customdata=df_disp["hover_fecha"],
             hovertemplate="Fecha: %{customdata}<br>Probabilidad: %{y:.1f}%<extra></extra>",
         ))
-        fig_model.add_hrect(y0=0, y1=0.33, opacity=0.2, fillcolor="#0F4C5C", line_width=0,layer="below")
-        fig_model.add_hrect(y0=0.33, y1=0.5, opacity=0.2, fillcolor="#FB8B24", line_width=0,layer="below")
-        fig_model.add_hrect(y0=0.5, y1=0.7, opacity=0.2, fillcolor="#E36414", line_width=0,layer="below")
-        fig_model.add_hrect(y0=0.7, y1=0.9, opacity=0.2,fillcolor="#9A031E", line_width=0,layer="below")
-        fig_model.add_hrect(y0=0.9, y1=1.0, opacity=0.2, fillcolor="#5F0F40", line_width=0,layer="below")
-
+        fig_model.add_hrect(y0=0.0, y1=33, opacity=0.2, fillcolor="#0F4C5C", line_width=0,layer="below")
+        fig_model.add_hrect(y0=33, y1=50, opacity=0.2, fillcolor="#FB8B24", line_width=0,layer="below")
+        fig_model.add_hrect(y0=50, y1=70, opacity=0.2, fillcolor="#E36414", line_width=0,layer="below")
+        fig_model.add_hrect(y0=70, y1=90, opacity=0.2,fillcolor="#9A031E", line_width=0,layer="below")
+        fig_model.add_hrect(y0=90, y1=100, opacity=0.2, fillcolor="#5F0F40", line_width=0,layer="below")
+        
         fig_model.update_layout(
             title="Evolución mensual de la probabilidad de sequía según el modelo",
             xaxis_title="Año",
