@@ -341,7 +341,7 @@ if monthly.empty:
 
 logo_col1, logo_col2, logo_col3 = st.columns([1, 1, 1])
 with logo_col2:
-    st.image("logo.png", use_container_width=True)
+    st.image("Dashboard_Challenge/logo.png", use_container_width=True)
 
 
 # Placeholder: valor de tu modelo (puedes conectarlo luego)
