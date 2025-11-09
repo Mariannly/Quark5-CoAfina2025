@@ -202,57 +202,113 @@ if df_filtered.empty:
 # LAYOUT: MAIN (EXPLORACIÓN) + PANEL DERECHO (CHATBOT)
 # =========================
 
-st.markdown("---")
+import xarray as xr
+import xclim as xc
+import pymannkendall as mk
+import plotly.graph_objects as go
+import numpy as np
+
 main_col, chat_col = st.columns([3, 1])
 
-# --------- MAIN: EXPLORACIÓN ----------
 with main_col:
-    st.subheader(f"Exploración histórica de {selected_var} ({start_year}–{end_year})")
+    st.header("Análisis climático - ERA5 / SPI/ SPEI")
 
-    # Métricas
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Media", f"{df_filtered[selected_var].mean():.4f}")
-    c2.metric("Mínimo", f"{df_filtered[selected_var].min():.4f}")
-    c3.metric("Máximo", f"{df_filtered[selected_var].max():.4f}")
+    # Cargar el archivo .nc con los daros de ERA5
+    file_path= "data_stream-moda.nc"
 
-    # Gráficas
-    left_col, right_col = st.columns((2.5, 1.5))
+    if not os.path.exists(file_path):
+        st.warning("No se encontró el archivo 'data_stream-moda.n'.")
+    else:
+        ds = xr.open_dataset(file_path)
+        df_era = ds.to_dataframe().dropna().reset_index()
 
-    with left_col:
-        st.markdown("**Promedio anual**")
-        yearly = (
-            df_filtered
-            .groupby("year")[selected_var]
-            .mean()
-            .reset_index()
-        )
+        df_era['valid_time'] = pd.to_datetime(df_era['valid_time'])
 
-        chart_yearly = (
-            alt.Chart(yearly)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("year:O", title="Año"),
-                y=alt.Y(selected_var, title=selected_var),
-                tooltip=["year", selected_var],
-            )
-        )
-        st.altair_chart(chart_yearly, width="stretch")
+    # Variables importantes
 
-    with right_col:
-        st.markdown("**Distribución en el rango seleccionado**")
-        hist = (
-            alt.Chart(df_filtered)
-            .mark_bar()
-            .encode(
-                x=alt.X(selected_var, bin=alt.Bin(maxbins=30), title=selected_var),
-                y=alt.Y("count()", title="Frecuencia"),
-            )
-        )
-        st.altair_chart(hist, width="stretch")
+    value_cols = ["t2m","swvl1","swvl2","swvl3","swvl4","ssrd","pev","e","tp"]
+    df_era = df_era.groupby("valid_time", as_index= False)[value_cols].mean()
+    days = 30
 
-    # Tabla
-    st.markdown("**Muestra de datos filtrados**")
-    st.dataframe(df_filtered.head(200), use_container_width=True)
+
+    # Conversiones de unidades
+    df_era["t2m"] -= 273.15
+    for col in ["swvl1","swvl2","swvl3","swvl4"]:
+        df_era[col] *= 100
+    df_era["tp"] *= days * 1000
+    df_era["e"]  = -df_era["e"] * days * 1000
+    df_era["pev"] = -df_era["pev"] * days * 1000
+    df_era["ssrd"] /= 86400.0
+
+    # Cálculo SPI / SPEI
+    #pr  = xr.DataArray(df_era["tp"].values,  coords={"time": df_era["valid_time"]}, dims="time")
+    #pet = xr.DataArray(df_era["pev"].values, coords={"time": df_era["valid_time"]}, dims="time")
+    #wb = pr - pet
+
+    # Cálculo SPI / SPEI
+    pr  = xr.DataArray(
+        df_era["tp"].values,
+        coords={"time": df_era["valid_time"]},
+        dims="time",
+        attrs={"units": "mm/month"}   # 👈 aquí agregamos las unidades
+    )
+
+    pet = xr.DataArray(
+        df_era["pev"].values,
+        coords={"time": df_era["valid_time"]},
+        dims="time",
+        attrs={"units": "mm/month"}   # 👈 lo mismo para PET
+    )
+
+    wb = pr - pet
+    wb.attrs["units"] = "mm/month"    # 👈 y también para el balance hídrico
+
+
+    #SPI  = xc.indices.spi
+    #SPEI = xc.indices.spei
+
+    # Compatibilidad con diferentes versiones de xclim
+    SPI  = getattr(xc.indices, "spi",  getattr(xc.indices, "standardized_precipitation_index"))
+    SPEI = getattr(xc.indices, "spei", getattr(xc.indices, "standardized_precipitation_evapotranspiration_index"))
+
+
+    spi = {k: SPI(pr, window=k).to_series().rename(f"SPI_{k}") for k in [1,3,6,12]}
+    spei = {k: SPEI(wb=wb, window=k).to_series().rename(f"SPEI_{k}") for k in [1,3,6,12]}
+
+    df_era = df_era.set_index("valid_time").join(pd.concat([*spi.values(), *spei.values()], axis=1)).dropna().reset_index()
+
+    # ---- Gráfico 1: Precipitación y Evaporación ----
+    fig1 = go.Figure()
+    fig1.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era["e"], mode='lines', name="Evaporación Total"))
+    fig1.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era["tp"], mode='lines', name="Precipitación Total"))
+    fig1.update_layout(
+        title="Precipitación y Evaporación Total (mm/mes)",
+        xaxis_title="Año",
+        yaxis_title="Valor (mm/mes)",
+        hovermode="x unified"
+    )
+
+    # ---- Gráfico 2: SPI ----
+    fig2 = go.Figure()
+    for k in [1,3,6,12]:
+        fig2.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era[f"SPI_{k}"], mode='lines', name=f"SPI_{k}"))
+    fig2.update_layout(title="Índice de Precipitación Estandarizado (SPI)", hovermode="x unified")
+
+    # ---- Gráfico 3: SPEI ----
+    fig3 = go.Figure()
+    for k in [1,3,6,12]:
+        fig3.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era[f"SPEI_{k}"], mode='lines', name=f"SPEI_{k}"))
+    fig3.update_layout(title="Índice de Precipitación y Evapotranspiración Estandarizado (SPEI)", hovermode="x unified")
+
+    # Mostrar las gráficas en pestañas
+    tab1, tab2, tab3 = st.tabs(["🌧️ Precipitación / Evaporación", "📈 SPI", "🔥 SPEI"])
+    with tab1:
+        st.plotly_chart(fig1, use_container_width=True)
+    with tab2:
+        st.plotly_chart(fig2, use_container_width=True)
+    with tab3:
+        st.plotly_chart(fig3, use_container_width=True)
+
 
 # --------- PANEL DERECHO: CHATBOT CON SCROLL ----------
 with chat_col:
@@ -323,6 +379,12 @@ with chat_col:
                     st.markdown(f"🧑‍💻 **Tú:** {msg['content']}")
                 else:
                     st.markdown(f"🤖 **Asistente:** {msg['content']}")
+
+# =========================
+# 4) ANALISIS DE SEQUIAS ( ERA5 / SPI/ SPEI)
+# =========================
+
+# Lo de aqui se movio para arriba junto al chat bot
 
 # =========================
 # 5) BUZÓN DE REPORTES
