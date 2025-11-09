@@ -565,7 +565,7 @@ with st.form("form_reporte"):
 # =========================
 
 st.markdown("---")
-st.header("**Payground para expertos**")
+st.header("**Playground para expertos**")
 
 if model is None:
     st.info("El modelo de IA no está disponible en este momento.")

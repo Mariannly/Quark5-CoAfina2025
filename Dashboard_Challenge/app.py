@@ -443,13 +443,10 @@ st.markdown("---")
 
 
 
-
 # =========================
 # SECCIÓN 2:
 # FILTROS GENERALES (SIDEBAR IZQUIERDA)
 # =========================
-
-
 
 numeric_cols = [
     c for c in df.select_dtypes(include="number").columns
@@ -484,7 +481,7 @@ if df_filtered.empty:
 main_col, chat_col = st.columns([3, 1])
 
 with main_col:
-    st.header("**Análisis climático basado en ERA5-Land (Monthly)**")
+    st.header("**Análisis climático basado en ERA5-Land (Mensual)**")
 
     # --------- Gráfico 1: Precipitación vs Evaporación ----------
     fig1 = go.Figure()
@@ -792,7 +789,7 @@ if all(col in df.columns for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_
     """)
 
     # =========================
-    # Gráfica: Eventos históricos + tendencia (como en Colab)
+    # Gráfica: Eventos históricos + tendencia 
     # =========================
 
     # Usar últimos 150 puntos (o todos si hay menos)
@@ -862,8 +859,7 @@ if all(col in df.columns for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_
         layer="below",
     )
 
-
-    # Anotaciones (como en tu Colab)
+    # Anotaciones 
     fig2.add_annotation(
         x=pd.to_datetime("2021-02-15"), y=1.0,
         text="Río Tapias",
@@ -973,7 +969,7 @@ with st.form("form_reporte"):
 # =========================
 
 st.markdown("---")
-st.header("**Payground para expertos**")
+st.header("**Playground para expertos**")
 
 if model is None:
     st.info("El modelo de IA no está disponible en este momento.")
