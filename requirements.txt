@@ -1,0 +1,35 @@
+# Comentarios:
+# - cfgrib depends on the ECMWF ecCodes C library (install via apt/conda); see notes below.
+# - cdsapi may require a ~/.cdsapirc file with your CDS credentials.
+
+# Core scientific stack
+numpy>=1.24.0,<2.0
+pandas>=1.5.3
+scipy>=1.10.0
+
+# Xarray / NetCDF / grib
+xarray>=2023.11.0
+netCDF4>=1.6.0
+cfgrib>=0.9.9
+cdsapi>=0.6.0
+
+# Climate analysis
+xclim>=0.43.0
+pymannkendall>=1.4.1
+
+# Plotting
+matplotlib>=3.7.0
+seaborn>=0.12.2
+plotly>=5.15.0
+
+# Machine learning
+scikit-learn>=1.2.2
+joblib>=1.2.0
+
+# Parallel / larger arrays (optional but often required by xarray/xclim workflows)
+dask>=2022.12.0
+
+# Notas:
+# Los notebooks se pueden correr en Colab sin modificaciones. 
+
+

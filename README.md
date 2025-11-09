@@ -2,15 +2,8 @@
 ### *Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales*
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Made with ❤️ in Colombia](https://img.shields.io/badge/Made%20with%20❤️%20in-Colombia-yellow)]()
-
-**Autores**:   
-Alexa Serrano  
-Cristian Orduz  
-Jhon Almanzar  
-Andre Avila  
-Mariannly Marquez 
+[![Licencia: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Hecho con ❤️ en Colombia](https://img.shields.io/badge/Made%20with%20❤️%20in-Colombia-yellow)]()
 
 ---
 
@@ -33,4 +26,49 @@ El proyecto busca fortalecer la capacidad de **prevención y gestión del riesgo
 
 ## 🧩 Estructura del repositorio
 
+S-ARIDA/
+│
+├── 📁 Análisis Histórico
+│ ├── 01 Análisis_histórico_Riohacha.ipynb
+├── 📁 Modelo Predictivo
+│ └── 01_modelo_predicción.ipynb
+├── 📁 Dashboard
+│
+├── README.md 
+└── requirements.txt
 
+---
+
+## ⚙️ Requisitos
+
+Para ejecutar el proyecto localmente:
+
+```bash
+git clone https://github.com/<usuario>/S-ARIDA.git
+cd S-ARIDA
+pip install -r requirements.txt
+```
+---
+
+## 🧠 Equipo
+
+S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos  y trabajadores sociales.
+
+👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo
+👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico
+👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard
+👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard
+👨‍💻 [Andre Avila] —  Comunicación / Contexto Regional
+
+---
+
+## 📚 Licencia
+
+Este proyecto está licenciado bajo los términos de ----- License.
+Puedes usarlo y adaptarlo libremente citando la fuente original.
+
+---
+
+## 🌞 Cita recomendada
+
+“S-ARIDA: Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales. Proyecto de análisis climático para Riohacha basado en datos ERA5 y aprendizaje automático.”
