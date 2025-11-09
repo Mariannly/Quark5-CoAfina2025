@@ -148,7 +148,22 @@ st.markdown(
 # =========================
 @st.cache_data
 def load_data():
-    df = pd.read_parquet("dataset_clima.parquet")
+
+    path="dataset_clima.parquet"
+
+    if not os.path.exists(path):
+        st.warning(
+            f"El dataset '{path}' no está disponible en el servidor. "
+            "Puedes subirlo a la carpeta Dashboard_Challenge en el repo, usar Git LFS o configurar una URL de descarga."
+        )
+        # Retornar valores vacíos o None para que la app pueda manejar la ausencia
+        return None, None
+
+    try:
+        df = pd.read_parquet(path)
+    except Exception as e:
+        st.error(f"No se pudo leer '{path}'. Detalle: {e}")
+        return None, None
 
     # Asegurar columna de tiempo homogénea
     if "valid_time" in df.columns:
@@ -212,11 +227,15 @@ def load_modelo_probs():
 
 @st.cache_resource
 def load_model():
+    path="modelo_sequia_hgb.pkl"
+    if not os.path.exists(path):
+        st.info(f"El archivo de modelo '{path}' no fue encontrado. La funcionalidad de predicción estará deshabilitada.")
+        return None
     try:
-        model = joblib.load("modelo_sequia_hgb.pkl")
+        model = joblib.load(path)
         return model
     except Exception as e:
-        st.error(f"No se pudo cargar el modelo de sequía desde 'modelo_sequia_hgb.pkl'. Detalle: {e}")
+        st.error(f"No se pudo cargar el modelo de sequía desde '{path}'. Detalle: {e}")
         return None
 
 model = load_model()
