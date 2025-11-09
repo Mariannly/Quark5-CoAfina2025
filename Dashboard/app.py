@@ -5,6 +5,11 @@ from google import genai
 import os
 import csv
 from datetime import datetime
+import plotly.graph_objects as go
+import pickle
+import numpy as np
+import joblib
+import pymannkendall as mk
 
 # =========================
 # CONFIG PÁGINA
@@ -22,7 +27,7 @@ st.set_page_config(
 def load_data():
     df = pd.read_parquet("dataset_clima.parquet")
 
-        # Asegurar columna de tiempo
+    # Asegurar columna de tiempo homogénea
     if "valid_time" in df.columns:
         df["valid_time"] = pd.to_datetime(df["valid_time"])
         df["date"] = df["valid_time"]
@@ -32,16 +37,15 @@ def load_data():
         st.error("No se encontró columna de tiempo ('valid_time' o 'date') en el dataset.")
         st.stop()
 
-    # Año
-    if "year" not in df.columns:
-        df["year"] = df["date"].dt.year
+    # Año desde la fecha (automático: incluye 2025 si existe)
+    df["year"] = df["date"].dt.year
 
-    # Asegurar tp
+    # Verificar precipitación (tp)
     if "tp" not in df.columns:
-        st.error("No se encontró la columna 'tp' (Precipitacion_total) en el dataset.")
+        st.error("No se encontró la columna 'tp' (Precipitación total) en el dataset.")
         st.stop()
 
-    # Serie mensual agregada (ej: promedio espacial de tp)
+    # Serie mensual agregada completa
     monthly = (
         df.groupby(pd.Grouper(key="date", freq="MS"))["tp"]
         .mean()
@@ -50,7 +54,49 @@ def load_data():
     )
 
     return df, monthly
+@st.cache_data
 
+@st.cache_data
+def load_modelo_probs():
+    try:
+        dfm = pd.read_parquet("dataset_modelo.parquet")
+
+        if "valid_time" not in dfm.columns:
+            st.error("El archivo 'dataset_modelo.parquet' debe contener la columna 'valid_time'.")
+            return None
+        if "proba" not in dfm.columns:
+            st.error("El archivo 'dataset_modelo.parquet' debe contener la columna 'proba'.")
+            return None
+
+        # Asegurar fecha
+        dfm["valid_time"] = pd.to_datetime(dfm["valid_time"])
+
+        # Forzar serie mensual (por si hay más de un valor en el mes)
+        monthly = (
+            dfm.resample("MS", on="valid_time")["proba"]
+            .mean()
+            .reset_index()
+            .rename(columns={"valid_time": "date"})
+            .sort_values("date")
+        )
+
+        return monthly
+
+    except FileNotFoundError:
+        st.warning("No se encontró 'dataset_modelo.parquet'. No se mostrará la gráfica de probabilidades de sequía.")
+        return None
+
+
+@st.cache_resource
+def load_model():
+    try:
+        model = joblib.load("modelo_sequia_hgb.pkl")
+        return model
+    except Exception as e:
+        st.error(f"No se pudo cargar el modelo de sequía desde 'modelo_sequia_hgb.pkl'. Detalle: {e}")
+        return None
+
+model = load_model()
 
 df, monthly = load_data()
 
@@ -64,12 +110,12 @@ if monthly.empty:
 
 st.markdown(
     "<h1 style='text-align: center; margin-bottom: 0.4rem;'>"
-    "Dashboard de Sequías - Riohacha"
+    "S-ARIDA"
     "</h1>",
     unsafe_allow_html=True,
 )
 
-# Placeholder: valor de tu modelo
+# Placeholder: valor de tu modelo (puedes conectarlo luego)
 prob_sequia = 37
 
 st.markdown(
@@ -84,86 +130,51 @@ st.markdown("---")
 
 # =========================
 # SECCIÓN 1:
-# ÚLTIMOS 12 MESES + 1 MES FUTURO (precipitacion_total)
+# PROBABILIDAD MENSUAL DE SEQUÍA (VISTA ANUAL)
 # =========================
 
-last_12 = monthly.tail(12).copy()
-last_date = last_12["date"].max()
-next_month_date = last_date + pd.DateOffset(months=1)
-
-# Predicción dummy: promedio últimos 12 meses
-pred_prec = float(last_12["tp"].mean())
-
-last_12["is_pred"] = 0
-pred_row = pd.DataFrame(
-    {"date": [next_month_date], "tp": [pred_prec], "is_pred": [1]}
-)
-plot_df = pd.concat([last_12, pred_row], ignore_index=True)
+monthly_probs = load_modelo_probs()
 
 
-# Bandas de colores (ajusta umbrales según tu lógica)
-bands = pd.DataFrame([
-    {"y1": 0, "y2": 1, "color": "#2196F3"},  # azul
-    {"y1": 1, "y2": 2, "color": "#4CAF50"},  # verde
-    {"y1": 2, "y2": 3, "color": "#FFEB3B"},  # amarillo
-    {"y1": 3, "y2": 4, "color": "#F44336"},  # rojo
-])
+if monthly_probs is not None and not monthly_probs.empty:
+    df_disp = monthly_probs.copy()
 
-start = plot_df["date"].min()
-end = plot_df["date"].max()
-bands["start"] = start
-bands["end"] = end
+    # Si 'proba' está entre 0 y 1, pásalo a porcentaje.
+    # Si ya está en 0-100, comenta esta línea.
+    df_disp["proba_pct"] = df_disp["proba"] * 100
 
-band_chart = (
-    alt.Chart(bands)
-    .mark_rect(opacity=0.25)
-    .encode(
-        x="start:T",
-        x2="end:T",
-        y="y1:Q",
-        y2="y2:Q",
-        color=alt.Color("color:N", scale=None, legend=None),
-    )
-)
+    fig_model = go.Figure()
 
-line_chart = (
-    alt.Chart(plot_df)
-    .mark_line(point=True)
-    .encode(
-        x=alt.X(
-            "date:T",
-            title="Mes",
-            axis=alt.Axis(
-                format="%b",
-                tickCount=13,
-            ),
+    fig_model.add_trace(go.Scatter(
+        x=df_disp["date"],
+        y=df_disp["proba_pct"],
+        mode="lines+markers",
+        name="Probabilidad de sequía",
+        hovertemplate="Fecha: %{x|%Y-%m}<br>Probabilidad: %{y:.1f}%<extra></extra>",
+    ))
+
+    fig_model.update_layout(
+        title="Evolución mensual de la probabilidad de sequía según el modelo",
+        xaxis_title="Año",
+        yaxis_title="Probabilidad de sequía (%)",
+        hovermode="x unified",
+        xaxis=dict(
+            tickformat="%Y",   # muestra años en las etiquetas principales
+            dtick="M12",       # un tick grande cada 12 meses
+            rangeslider=dict(visible=True)  # permite hacer zoom y ver el detalle mensual
         ),
-        y=alt.Y("tp:Q", title="tp (mm/mes)"),
-        color=alt.condition(
-            "datum.is_pred == 1",
-            alt.value("#F44336"),   # predicción
-            alt.value("#00d492"),   # histórico
-        ),
-        tooltip=["date:T", "tp:Q"],
     )
-)
 
-pred_points = (
-    alt.Chart(plot_df[plot_df["is_pred"] == 1])
-    .mark_point(size=80, filled=True)
-    .encode(
-        x="date:T",
-        y="tp:Q",
-        color=alt.value("#F44336"),
-        tooltip=["date:T", "tp:Q"],
+    st.plotly_chart(fig_model, width="stretch")
+
+    st.caption(
+        "Cada punto representa la probabilidad estimada de sequía para un mes específico. "
+        "El eje horizontal resume por año, pero al usar el control de zoom puedes explorar "
+        "el comportamiento mes a mes en mayor detalle."
     )
-)
+else:
+    st.info("No se pudo cargar información válida desde 'dataset_modelo.parquet' para esta gráfica.")
 
-
-st.subheader("Últimos 12 meses de 'precipitacion_total' + proyección al siguiente mes")
-st.altair_chart(band_chart + line_chart + pred_points, width="stretch")
-
-st.markdown("---")
 
 
 # =========================
@@ -171,7 +182,7 @@ st.markdown("---")
 # FILTROS GENERALES (SIDEBAR IZQUIERDA)
 # =========================
 
-st.sidebar.header("Filtros generales")
+
 
 numeric_cols = [
     c for c in df.select_dtypes(include="number").columns
@@ -182,7 +193,7 @@ if not numeric_cols:
     st.error("No se encontraron variables numéricas para visualizar.")
     st.stop()
 
-selected_var = st.sidebar.selectbox("Variable a analizar:", numeric_cols)
+
 
 year_min = int(df["year"].min())
 year_max = int(df["year"].max())
@@ -205,105 +216,81 @@ if df_filtered.empty:
 # LAYOUT: MAIN (EXPLORACIÓN) + PANEL DERECHO (CHATBOT)
 # =========================
 
-import xarray as xr
-import xclim as xc
-import pymannkendall as mk
-import plotly.graph_objects as go
-import numpy as np
-
 main_col, chat_col = st.columns([3, 1])
 
 with main_col:
-    st.header("Análisis climático - ERA5 / SPI/ SPEI")
+    st.header("**Análisis climático basado en ERA5-Land (Monthly)**")
 
-    # Cargar el archivo .nc con los daros de ERA5
-    file_path= "data_stream-moda.nc"
-
-    if not os.path.exists(file_path):
-        st.warning("No se encontró el archivo 'data_stream-moda.n'.")
-    else:
-        ds = xr.open_dataset(file_path)
-        df_era = ds.to_dataframe().dropna().reset_index()
-
-        df_era['valid_time'] = pd.to_datetime(df_era['valid_time'])
-
-    # Variables importantes
-
-    value_cols = ["t2m","swvl1","swvl2","swvl3","swvl4","ssrd","pev","e","tp"]
-    df_era = df_era.groupby("valid_time", as_index= False)[value_cols].mean()
-    days = 30
-
-
-    # Conversiones de unidades
-    df_era["t2m"] -= 273.15
-    for col in ["swvl1","swvl2","swvl3","swvl4"]:
-        df_era[col] *= 100
-    df_era["tp"] *= days * 1000
-    df_era["e"]  = -df_era["e"] * days * 1000
-    df_era["pev"] = -df_era["pev"] * days * 1000
-    df_era["ssrd"] /= 86400.0
-
-    # Cálculo SPI / SPEI
-    #pr  = xr.DataArray(df_era["tp"].values,  coords={"time": df_era["valid_time"]}, dims="time")
-    #pet = xr.DataArray(df_era["pev"].values, coords={"time": df_era["valid_time"]}, dims="time")
-    #wb = pr - pet
-
-    # Cálculo SPI / SPEI
-    pr  = xr.DataArray(
-        df_era["tp"].values,
-        coords={"time": df_era["valid_time"]},
-        dims="time",
-        attrs={"units": "mm/month"}   # 👈 aquí agregamos las unidades
-    )
-
-    pet = xr.DataArray(
-        df_era["pev"].values,
-        coords={"time": df_era["valid_time"]},
-        dims="time",
-        attrs={"units": "mm/month"}   # 👈 lo mismo para PET
-    )
-
-    wb = pr - pet
-    wb.attrs["units"] = "mm/month"    # 👈 y también para el balance hídrico
-
-
-    #SPI  = xc.indices.spi
-    #SPEI = xc.indices.spei
-
-    # Compatibilidad con diferentes versiones de xclim
-    SPI  = getattr(xc.indices, "spi",  getattr(xc.indices, "standardized_precipitation_index"))
-    SPEI = getattr(xc.indices, "spei", getattr(xc.indices, "standardized_precipitation_evapotranspiration_index"))
-
-
-    spi = {k: SPI(pr, window=k).to_series().rename(f"SPI_{k}") for k in [1,3,6,12]}
-    spei = {k: SPEI(wb=wb, window=k).to_series().rename(f"SPEI_{k}") for k in [1,3,6,12]}
-
-    df_era = df_era.set_index("valid_time").join(pd.concat([*spi.values(), *spei.values()], axis=1)).dropna().reset_index()
-
-    # ---- Gráfico 1: Precipitación y Evaporación ----
+    # --------- Gráfico 1: Precipitación vs Evaporación ----------
     fig1 = go.Figure()
-    fig1.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era["e"], mode='lines', name="Evaporación Total"))
-    fig1.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era["tp"], mode='lines', name="Precipitación Total"))
+
+    if "e" in df_filtered.columns:
+        fig1.add_trace(go.Scatter(
+            x=df_filtered["date"],
+            y=df_filtered["e"],
+            mode="lines",
+            name="Evaporación total (e)"
+        ))
+
+    if "tp" in df_filtered.columns:
+        fig1.add_trace(go.Scatter(
+            x=df_filtered["date"],
+            y=df_filtered["tp"],
+            mode="lines",
+            name="Precipitación total (tp)"
+        ))
+
     fig1.update_layout(
-        title="Precipitación y Evaporación Total (mm/mes)",
-        xaxis_title="Año",
-        yaxis_title="Valor (mm/mes)",
+        title="Precipitación vs Evaporación total (mm/mes)",
+        xaxis_title="Fecha",
+        yaxis_title="Valor",
         hovermode="x unified"
     )
 
-    # ---- Gráfico 2: SPI ----
+    # --------- Gráfico 2: SPI ----------
     fig2 = go.Figure()
-    for k in [1,3,6,12]:
-        fig2.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era[f"SPI_{k}"], mode='lines', name=f"SPI_{k}"))
-    fig2.update_layout(title="Índice de Precipitación Estandarizado (SPI)", hovermode="x unified")
+    spi_cols = [c for c in ["SPI_1", "SPI_3", "SPI_6", "SPI_12"] if c in df_filtered.columns]
 
-    # ---- Gráfico 3: SPEI ----
+    if spi_cols:
+        for c in spi_cols:
+            fig2.add_trace(go.Scatter(
+                x=df_filtered["date"],
+                y=df_filtered[c],
+                mode="lines",
+                name=c
+            ))
+        fig2.update_layout(
+            title="Índice de Precipitación Estandarizado (SPI)",
+            xaxis_title="Fecha",
+            hovermode="x unified"
+        )
+    else:
+        fig2.update_layout(
+            title="SPI no disponible en el dataset",
+        )
+
+    # --------- Gráfico 3: SPEI ----------
     fig3 = go.Figure()
-    for k in [1,3,6,12]:
-        fig3.add_trace(go.Scatter(x=df_era["valid_time"], y=df_era[f"SPEI_{k}"], mode='lines', name=f"SPEI_{k}"))
-    fig3.update_layout(title="Índice de Precipitación y Evapotranspiración Estandarizado (SPEI)", hovermode="x unified")
+    spei_cols = [c for c in ["SPEI_1", "SPEI_3", "SPEI_6", "SPEI_12"] if c in df_filtered.columns]
 
-    # Mostrar las gráficas en pestañas
+    if spei_cols:
+        for c in spei_cols:
+            fig3.add_trace(go.Scatter(
+                x=df_filtered["date"],
+                y=df_filtered[c],
+                mode="lines",
+                name=c
+            ))
+        fig3.update_layout(
+            title="Índice SPEI (Precipitación - Evapotranspiración)",
+            xaxis_title="Fecha",
+            hovermode="x unified"
+        )
+    else:
+        fig3.update_layout(
+            title="SPEI no disponible en el dataset",
+        )
+
     tab1, tab2, tab3 = st.tabs(["🌧️ Precipitación / Evaporación", "📈 SPI", "🔥 SPEI"])
     with tab1:
         st.plotly_chart(fig1, use_container_width=True)
@@ -311,7 +298,6 @@ with main_col:
         st.plotly_chart(fig2, use_container_width=True)
     with tab3:
         st.plotly_chart(fig3, use_container_width=True)
-
 
 # --------- PANEL DERECHO: CHATBOT CON SCROLL ----------
 with chat_col:
@@ -354,6 +340,69 @@ with chat_col:
                 prompt = (
                     "Eres un asistente experto en clima y sequías en Riohacha.\n"
                     "Responde en español, claro y sin inventar datos.\n\n"
+                    "INFORMACIÓN CONCEPTUAL SOBRE LAS SEQUÍAS Y CAMBIO CLIMÁTICO\n\n"
+                    "SEQUÍA METEOROLÓGICA: Ausencia prolongada o escasez acusada de precipitación.\n"
+                    "Sequía hidrológica (déficit hídrico): Período de tiempo anormalmente seco, lo suficientemente prolongado "
+                    "para ocasionar una escasez de agua, que se refleja en una disminución apreciable en el caudal de los ríos "
+                    "y en el nivel de los lagos y/o en el agotamiento de la humedad del suelo y el descenso de los niveles de aguas "
+                    "subterráneas por debajo de sus valores normales.\n"
+                    "CAMBIO CLIMÁTICO: alteración significativa y persistente de las propiedades estadísticas del sistema climático "
+                    "(principalmente su promedio y dispersión) durante periodos largos de tiempo, y puede ser causado tanto por procesos "
+                    "naturales como principalmente por actividades humanas que modifican la composición de la atmósfera. Según la Convención "
+                    "Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC), se trata de un cambio de clima atribuido directa o "
+                    "indirectamente a la actividad humana, distinguiéndose de la mera variabilidad climática natural. Fuente: Wikipedia y "
+                    "cambioclimatico.gov.co.\n"
+                    "El cambio climático está intensificando los periodos de sequía y lluvia a nivel global. Las sequías actuales son más "
+                    "frecuentes, extensas y prolongadas, mientras que los periodos lluviosos muestran precipitaciones más extremas e irregulares. "
+                    "El aumento de temperaturas incrementa la evaporación del suelo y la evapotranspiración de las plantas, disminuyendo el agua "
+                    "disponible y agravando la aridificación de los climas. En consecuencia, los años húmedos son menos húmedos y los secos son "
+                    "mucho más secos.\n"
+                    "Las zonas ubicadas en el ecuador y los trópicos experimentan con mayor rapidez y severidad los efectos del cambio climático. "
+                    "Por ejemplo, en Ecuador y países tropicales, se observan cambios notorios en los patrones de precipitación: hay una alternancia "
+                    "entre sequías intensas y lluvias torrenciales, lo que da lugar a deslizamientos de tierra, alteraciones en la agricultura y "
+                    "pérdida significativa de cultivos. Además, los eventos extremos como El Niño y La Niña, influidos por el calentamiento global, "
+                    "modifican las temporadas tradicionales de lluvias y sequías, volviéndolas más impredecibles y acentuando sus impactos sociales "
+                    "y ecológicos. Fuente: https://www.wwfca.org/nuestrotrabajo/clima_energia/impacto_cambio_climatico_latinoamerica , "
+                    "https://www.agenciasinc.es/Noticias/Las-areas-tropicales-sufriran-antes-los-efectos-del-cambio-climatico.\n"
+                    "El cambio climático altera la duración, intensidad y periodicidad de las temporadas de lluvia y sequía. En muchas regiones "
+                    "ecuatoriales y tropicales, las lluvias intensas pueden concentrarse en periodos más cortos y las sequías prolongarse, generando "
+                    "desafíos para la gestión del agua y la seguridad alimentaria. Estas modificaciones pueden afectar de manera directa a sectores "
+                    "vulnerables como la agricultura, la biodiversidad y las poblaciones rurales, incrementando los riesgos de desastres naturales y "
+                    "desplazamientos humanos.\n\n"
+                    "EFECTOS E IMPACTOS DE LAS SEQUÍAS\n"
+                    "- Deshidratación poblacional, animal y vegetal: impacto en población, cultivos y ganado.\n"
+                    "- Impacto directo en abastecimiento alimentario por afectación de cultivos.\n"
+                    "- Incendios forestales por baja humedad y resequedad del suelo más radiación solar fuerte y temperaturas altas.\n"
+                    "- Escasez de agua en fuentes hídricas: desabastecimiento de acueductos y pozos, afectación de higiene y saneamiento, aumento del uso de agua no potable "
+                    "y aparición de enfermedades en personas y animales (gastrointestinales, dérmicas, desnutrición, especialmente en NNA).\n"
+                    "- Bajísima humedad y altas temperaturas: golpes de calor, insolación, deshidratación severa, afectación a personas con condiciones de salud previas.\n"
+                    "Desplazamiento por sequías: La falta de agua para consumo y agricultura lleva a la migración temporal o permanente, especialmente en áreas rurales y zonas "
+                    "áridas. Las sequías, exacerbadas por el cambio climático, afectan la disponibilidad de agua, la producción agrícola y la seguridad alimentaria, lo que puede "
+                    "forzar a las personas a abandonar sus hogares en busca de mejores condiciones de vida. Según el IDMC, en 2022 se registraron 31,8 millones de desplazamientos "
+                    "internos por fenómenos meteorológicos extremos a nivel global. Las sequías fueron la tercera causa principal, tras inundaciones y tormentas.\n\n"
+                    "SOBRE NUESTROS INDICADORES Y DATOS\n"
+                    "Índice Estandarizado de Precipitación y Evapotranspiración (SPEI): propuesto por Vicente-Serrano et al. (2010) como índice de sequía mejorado. "
+                    "Utiliza el balance hídrico climático (precipitación menos evapotranspiración de referencia), en distintas escalas de tiempo, proporcionando una medida "
+                    "robusta de la gravedad de la sequía.\n"
+                    "Cálculo SPEI: Los valores de P - ETo se ajustan a una distribución de probabilidad para transformarlos a unidades estandarizadas. Se recomienda la "
+                    "distribución Loglogística (Vicente-Serrano et al., 2010), adecuada para diferentes escalas y climas. Luego se normalizan los datos.\n\n"
+                    "DIFERENCIAS ENTRE INDICADORES E ÍNDICES\n"
+                    "Indicadores: variables usadas para describir condiciones de sequía (precipitación, temperatura, humedad del suelo, caudal de ríos, niveles de agua subterránea, etc.).\n"
+                    "Índices: representaciones numéricas de la severidad de la sequía construidas a partir de indicadores (como SPEI), que simplifican relaciones complejas y permiten "
+                    "evaluar intensidad, ubicación, tiempo y duración.\n\n"
+                    "IMPORTANCIA DE ESTA INFORMACIÓN\n"
+                    "Comprender cómo el cambio climático altera sequías y lluvias es clave para la gestión sostenible del agua, la planificación agrícola, el diseño de infraestructuras "
+                    "resilientes y la formulación de políticas públicas. La anticipación y monitoreo permiten reducir pérdidas humanas, económicas y ecológicas, especialmente en zonas "
+                    "vulnerables del ecuador y el trópico.\n\n"
+                    "Eres un experto en climatología y prevención de desastres naturales del Instituto de Hidrología, Meteorología y Estudios Ambientales de Colombia, pero también experto en divulgación científica y ciencia ciudadana, con mucha experiencia para compartir con funcionarios gubernamentales y población civil información que puede resultar compleja, haciéndola accesible para este público, pero que procura ceñirse a la información científica verificable y evitando a toda costa recaer en la desinformación o especulación. "
+                    "Tus respuestas serán dadas en un tono educativo, confiable y claro, NO TÉCNICO. "
+                    "Toma la información contextual suministrada a continuación para extraer y aprovechar el contenido, estableciendo relaciones conceptuales, contextuales y con los datos suministrados para responder de manera clara, eficiente, accesible y completa. "
+                    "Busca siempre primero la respuesta a la pregunta dentro de la información ya suministrada, y como último recurso en caso de no encontrar nada relacionado, sólo entonces haz una búsqueda web muy puntual y toma la fuente más fiable de información desde una perspectiva científica para responder, complementando la información que ya se tenía y retroalimentándola para volver a la información inicial y su importancia. "
+                    "Al buscar información de fuentes externas, priorizar siempre instituciones nacionales oficiales como el IDEAM, el Ministerio de Ambiente, el Ministerio de Agricultura, Corpoguajira, la Cruz Roja y la FAO, en ese orden, y secundariamente otras instituciones como ONGs especializadas en la problemática. "
+                    "Al dar la respuesta, no explicites tu posición de enunciación como investigador ni como experto, limítate a dar una respuesta acorde a la pregunta planteada: algo informativo pero sucinto que responda bien a lo solicitado, sin añadir información extra innecesaria que no esté relacionada directamente con ello. "
+                    "Sin embargo, puedes sugerir al final una pregunta de profundización o seguimiento en el tema. Por ejemplo, para la pregunta \"¿qué consecuencias tiene la sequía?\" la respuesta puede hablar brevemente de las consecuencias y efectos inmediatos de la sequía, mencionar que hay diferentes tipos de consecuencias (ambientales, sociales, poblacionales, de salud, etc.) y cerrar con algo como: "
+                    "\"¿Quieres que te cuente más sobre alguno de estos aspectos en particular?\" "
+                    "No atiborres de información: deja que las personas pregunten más por su cuenta.\n\n"
                     f"Contexto del dashboard:\n{contexto_basico}\n\n"
                     f"Pregunta del usuario:\n{user_input}"
                 )
@@ -363,6 +412,7 @@ with chat_col:
                     contents=prompt,
                 )
                 reply_text = (response.text or "").strip()
+
             except Exception as e:
                 reply_text = (
                     f"No pude obtener respuesta de Gemini. "
@@ -375,7 +425,6 @@ with chat_col:
 
         # Contenedor scrollable para el historial
         chat_box = st.container(height=350, border=True)
-
         with chat_box:
             for msg in st.session_state.chat_messages:
                 if msg["role"] == "user":
@@ -383,12 +432,8 @@ with chat_col:
                 else:
                     st.markdown(f"🤖 **Asistente:** {msg['content']}")
 
-# =========================
-# 4) Sección  de analisis de tendencias de sequias
-# =========================
-
 st.markdown("---")
-st.header("Análisis de tendencias de sequias (Mann-Kendall)")
+st.header("**Análisis de tendencias de sequias (Mann-Kendall)**")
 
 if all(col in df.columns for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_1', 'SPEI_3', 'SPEI_6', 'SPEI_12']):
     trend_data = []
@@ -486,17 +531,16 @@ if all(col in df.columns for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_
     """)
 else:
     st.info("⚠️ Aún no se han calculado los índices SPI/SPEI necesarios para el análisis de tendencias.")
-
 # =========================
 # 5) BUZÓN DE REPORTES
 # =========================
 
 st.markdown("---")
-st.header("Buzón de Reportes")
+st.header("**Buzón de Reportes**")
 
 st.markdown(
     "Si notas signos de sequía o cambios importantes en el clima de tu zona, "
-    "puedes dejar aquí tu observación. ¡Tu aporte ayuda a mejorar la información local!"
+    "puedes dejar aquí tu observación. Tu aporte ayuda a mejorar la información local."
 )
 
 with st.form("form_reporte"):
@@ -515,3 +559,177 @@ with st.form("form_reporte"):
                 writer.writerow([datetime.now().isoformat(), nombre, municipio, mensaje])
 
             st.success("¡Gracias por tu reporte! Se ha enviado correctamente.")
+
+# =========================
+# 6) MODELO IA - PREDICCIÓN DE SEQUÍA
+# =========================
+
+st.markdown("---")
+st.header("**Payground para expertos**")
+
+if model is None:
+    st.info("El modelo de IA no está disponible en este momento.")
+else:
+    # Último registro como referencia inicial
+    last_row = df.sort_values("date").iloc[-1]
+
+    # Dos columnas: izquierda descripción, derecha formulario
+    left_col, right_col = st.columns([1, 2])
+
+    # --------- COLUMNA IZQUIERDA: TEXTO EXPLICATIVO ----------
+    with left_col:
+        st.markdown(
+            """
+            **¡Bienvenido a nuestro simulador predictivo!** En él, podrás ingresar diferentes valores para cada uno de los índices e indicadores que alimentan nuestro modelo, para así tener una idea del riesgo de sequía según cómo se comportan las diferentes variables climatológicas.
+           
+            **¿Cómo usar esta herramienta?**
+
+            Ingresa los valores climáticos mensuales observados o estimados para tu zona.
+            Con estas variables, el modelo de IA calcula la probabilidad de que se presenten
+            condiciones compatibles con sequía.
+
+            """
+        )
+
+        st.markdown(
+            """
+            **Interpretación del resultado**
+
+            - Se muestra una probabilidad estimada de sequía.
+            - Además, se indica si, según el modelo, las condiciones corresponden o no
+              a un posible episodio de sequía.
+
+            Esta sección está pensada para apoyar la toma de decisiones,
+            comunicación de riesgos y análisis exploratorio.
+            """
+        )
+
+    # --------- COLUMNA DERECHA: FORMULARIO DE ENTRADA ----------
+    with right_col:
+        with st.form("form_prediccion_sequia"):
+            c1, c2 = st.columns(2)
+
+            with c1:
+                t2m_input = st.number_input(
+                    "t2m - Temperatura 2 m (°C)",
+                    value=float(last_row.get("t2m", 25.0)),
+                    format="%.8f"
+                )
+                st.caption("Más calor = más sed del aire.")
+
+                swvl1_input = st.number_input(
+                    "swvl1 - Humedad del suelo capa 1 (mm3)",
+                    value=float(last_row.get("swvl1", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Reserva muy superficial; responde rápido a falta de lluvia, la primera en evaporarse.")
+
+                swvl2_input = st.number_input(
+                    "swvl2 - Humedad del suelo capa 2 (mm3)",
+                    value=float(last_row.get("swvl2", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Reserva poco profunda; sostiene los cultivos durante algunos días/semanas.")
+
+                swvl3_input = st.number_input(
+                    "swvl3 - Humedad del suelo capa 3 (mm3)",
+                    value=float(last_row.get("swvl3", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Reserva profunda; de verse afectada negativamente, refleja una sequía más persistente.")
+
+                swvl4_input = st.number_input(
+                    "swvl4 - Humedad del suelo capa 4 (mm3)",
+                    value=float(last_row.get("swvl4", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Reserva muy profunda; cuando baja, también sufren ríos, embalses y las principales cuencas hídricas.")
+
+            with c2:
+                ssrd_input = st.number_input(
+                    "ssrd - Radiación solar hacia abajo (MJ/m²/día)",
+                    value=float(last_row.get("ssrd", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("A mayor intensidad de la radiación solar, más energía hay en contacto con nuestro ecosistema que potencialmente evapora el agua en el ambiente.")
+
+                pev_input = st.number_input(
+                    "pev - Evaporación potencial (mm/mes)",
+                    value=float(last_row.get("pev", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("La “sed” del aire, influenciada por el calor, el sol y el viento: según eso, ¿cuánta agua podría evaporarse?")
+
+                e_input = st.number_input(
+                    "e - Evaporación total (mm/mes)",
+                    value=float(last_row.get("e", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Lo que realmente se evapora y transpiran las plantas.")
+
+                tp_input = st.number_input(
+                    "tp - Precipitación total (mm/mes)",
+                    value=float(last_row.get("tp", 0.0)),
+                    format="%.8f"
+                )
+                st.caption("Cantidad de agua que cae con las lluvias en términos de cantidad por frecuencia de tiempo (mensual).")
+
+            submitted = st.form_submit_button("Calcular probabilidad de sequía")
+
+            if submitted:
+                # Orden de features EXACTAMENTE como en el entrenamiento:
+                # [t2m, swvl1, swvl2, swvl3, swvl4, ssrd, pev, e, tp]
+                X_input = np.array([[
+                    t2m_input,
+                    swvl1_input,
+                    swvl2_input,
+                    swvl3_input,
+                    swvl4_input,
+                    ssrd_input,
+                    pev_input,
+                    e_input,
+                    tp_input,
+                ]])
+
+                try:
+                    if hasattr(model, "predict_proba"):
+                        prob = float(model.predict_proba(X_input)[0][1])
+                        pred_class = int(model.predict(X_input)[0])
+                    else:
+                        pred_class = int(model.predict(X_input)[0])
+                        prob = None
+
+                    col_res1, col_res2 = st.columns(2)
+
+                    with col_res1:
+                        if prob is not None:
+                            st.metric(
+                                "Probabilidad estimada de sequía",
+                                f"{prob:.8f}"
+                            )
+                        else:
+                            st.write("El modelo no expone `predict_proba`, solo la clase predicha.")
+
+                    with col_res2:
+                        if pred_class == 1:
+                            st.markdown(
+                                "<div style='padding:0.6rem; border-radius:0.5rem; background-color:#ffe5e5;'>"
+                                "<b>Resultado del modelo:</b> Condiciones compatibles con <b>sequía</b>."
+                                "</div>",
+                                unsafe_allow_html=True,
+                            )
+                        else:
+                            st.markdown(
+                                "<div style='padding:0.6rem; border-radius:0.5rem; background-color:#e6ffed;'>"
+                                "<b>Resultado del modelo:</b> Sin indicios fuertes de sequía."
+                                "</div>",
+                                unsafe_allow_html=True,
+                            )
+
+                    st.caption(
+                        "Esta herramienta es de apoyo. La interpretación final debe considerar el contexto local, "
+                        "los índices de sequía y la información de entidades oficiales."
+                    )
+
+                except Exception as e:
+                    st.error(f"Ocurrió un error al generar la predicción: {e}")
