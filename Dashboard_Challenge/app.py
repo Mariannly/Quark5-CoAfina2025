@@ -254,7 +254,7 @@ _ = ensure_asset(
 # =========================
 @st.cache_data
 def load_data():
-    df = pd.read_parquet("dataset_clima.parquet")
+    df = pd.read_parquet("Dashboard_Challenge/dataset_clima.parquet")
 
     # Asegurar columna de tiempo homogénea
     if "valid_time" in df.columns:
@@ -288,7 +288,7 @@ def load_data():
 @st.cache_data
 def load_modelo_probs():
     try:
-        dfm = pd.read_parquet("dataset_modelo.parquet")
+        dfm = pd.read_parquet("Dashboard_Challenge/dataset_modelo.parquet")
 
         if "valid_time" not in dfm.columns:
             st.error("El archivo 'dataset_modelo.parquet' debe contener la columna 'valid_time'.")
@@ -319,7 +319,7 @@ def load_modelo_probs():
 @st.cache_resource
 def load_model():
     try:
-        model = joblib.load("modelo_sequia_hgb.pkl")
+        model = joblib.load("Dashboard_Challenge/modelo_sequia_hgb.pkl")
         return model
     except Exception as e:
         st.error(f"No se pudo cargar el modelo de sequía desde 'modelo_sequia_hgb.pkl'. Detalle: {e}")
