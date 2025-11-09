@@ -45,7 +45,7 @@ Para ejecutar el proyecto localmente:
 
 ```bash
 git clone https://github.com/Mariannly/Quark5-CoAfina2025.git
-cd S-ARIDA
+cd Quark5-CoAfina2025
 pip install -r requirements.txt
 ```
 ---
@@ -54,11 +54,11 @@ pip install -r requirements.txt
 
 S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos  y trabajadores sociales.
 
-👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo
-👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico
-👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard
-👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard
-👨‍💻 [Andre Avila] —  Comunicación / Contexto Regional
+👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo  
+👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico  
+👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard  
+👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard  
+👨‍💻 [Andre Avila] —  Comunicación / Contexto Regional  
 
 ---
 
