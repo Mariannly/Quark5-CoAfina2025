@@ -675,7 +675,7 @@ with main_col:
 with chat_col:
     st.header("**💬 Asistente climático**")
 
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = "AIzaSyD1CSvFFpJdKSkbpza60zqHKyKc-oO0nYQ"
 
     if not api_key:
         st.warning("Configura GEMINI_API_KEY para habilitar el chatbot.")
