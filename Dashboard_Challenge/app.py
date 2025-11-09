@@ -481,7 +481,7 @@ if df_filtered.empty:
 main_col, chat_col = st.columns([3, 1])
 
 with main_col:
-    st.header("**Análisis climático basado en ERA5-Land (Monthly)**")
+    st.header("**Análisis climático basado en ERA5-Land (Mensual)**")
 
     # --------- Gráfico 1: Precipitación vs Evaporación ----------
     fig1 = go.Figure()
