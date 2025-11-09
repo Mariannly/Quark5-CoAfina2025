@@ -11,6 +11,7 @@ Cristian Orduz
 Jhon Almanzar  
 Andre Avila  
 Mariannly Marquez 
+
 ---
 
 ## 🌍 Descripción del proyecto
