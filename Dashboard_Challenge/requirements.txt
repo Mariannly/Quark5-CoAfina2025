@@ -1,0 +1,10 @@
+streamlit>=1.24
+pandas>=1.5
+numpy
+plotly
+altair
+scikit-learn
+joblib
+pymannkendall
+pyarrow
+google-genai
