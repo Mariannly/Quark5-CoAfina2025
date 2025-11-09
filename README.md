@@ -3,7 +3,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Licencia: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Hecho con ❤️ en Colombia](https://img.shields.io/badge/Made%20with%20❤️%20in-Colombia-yellow)]()
+[![Hecho con ❤️ en Colombia](https://img.shields.io/badge/Hecho%20con%20❤️%20en-Colombia-yellow)]()
 
 ---
 
