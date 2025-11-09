@@ -16,10 +16,9 @@ Mariannly Marquez
 
 ## 🌍 Descripción del proyecto
 
-**S-ARIDA** es un sistema de análisis y alerta temprana para el monitoreo y predicción de **sequías** en **Riohacha** en el departamento de La Guajira (Colombia).  
-Utiliza datos climáticos del reanálisis **ERA5** y modelos de **machine learning** para estimar la probabilidad de ocurrencia de sequía en los siguientes 3 meses.
+**S-ARIDA** es un sistema de análisis y alerta temprana para el monitoreo y predicción de **sequías** en **Riohacha** en el departamento de La Guajira (Colombia). Para lograrlo, hace uso de datos climáticos del reanálisis **ERA5** y modelos de **machine learning** para estimar la probabilidad de ocurrencia de sequía en los siguientes 3 meses.
 
-El proyecto busca fortalecer la capacidad de **prevención y gestión del riesgo climático** en una de las regiones más afectadas por la aridez y el cambio climático en Colombia.
+Este proyecto de ciencia al servicio de la ciudadanía busca fortalecer la capacidad de **prevención y gestión del riesgo climático** en una de las regiones más afectadas por la aridez y el cambio climático en Colombia: La Guajira.
 
 ---
 
@@ -27,7 +26,8 @@ El proyecto busca fortalecer la capacidad de **prevención y gestión del riesgo
 
 - Analizar tendencias históricas de sequías usando datos ERA5 y el test de Mann-Kendall.    
 - Entrenar un modelo predictivo para estimar el riesgo trimensual de sequía.  
-- Proveer visualizaciones interactivas e interpretables para tomadores de decisiones locales.  
+- Proveer medios de visualización de datos interactivos que permitan realizar interpretaciones útiles para la toma de decisiones preventivas, planificación y desarrollo de acciones de mitigación de las consecuencias de las sequías.
+- Brindar recursos informativos para comprender mejor estas anomalías climáticas (causas y consecuencias) y pautas estratégicas para la prevención y mitigación de sus efectos en los ecosistemas y las comunidades locales.
 
 ---
 
