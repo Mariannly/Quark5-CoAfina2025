@@ -10,6 +10,8 @@ import pickle
 import numpy as np
 import joblib
 import pymannkendall as mk
+from pathlib import Path
+import requests
 
 #COLORES
 PALETTE = {
