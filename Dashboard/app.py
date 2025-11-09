@@ -165,6 +165,7 @@ st.altair_chart(band_chart + line_chart + pred_points, width="stretch")
 
 st.markdown("---")
 
+
 # =========================
 # SECCIÓN 2:
 # FILTROS GENERALES (SIDEBAR IZQUIERDA)
@@ -352,63 +353,7 @@ with chat_col:
             try:
                 prompt = (
                     "Eres un asistente experto en clima y sequías en Riohacha.\n"
-                    ""
                     "Responde en español, claro y sin inventar datos.\n\n"
-                    "INFORMACIÓN CONCEPTUAL SOBRE LAS SEQUÍAS Y CAMBIO CLIMÁTICO\n\n"
-                    "SEQUÍA METEOROLÓGICA: Ausencia prolongada o escasez acusada de precipitación.\n"
-                    "Sequía hidrológica (déficit hídrico): Período de tiempo anormalmente seco, lo suficientemente prolongado "
-                    "para ocasionar una escasez de agua, que se refleja en una disminución apreciable en el caudal de los ríos "
-                    "y en el nivel de los lagos y/o en el agotamiento de la humedad del suelo y el descenso de los niveles de aguas "
-                    "subterráneas por debajo de sus valores normales.\n"
-                    "CAMBIO CLIMÁTICO: alteración significativa y persistente de las propiedades estadísticas del sistema climático "
-                    "(principalmente su promedio y dispersión) durante periodos largos de tiempo, y puede ser causado tanto por procesos "
-                    "naturales como principalmente por actividades humanas que modifican la composición de la atmósfera. Según la Convención "
-                    "Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC), se trata de un cambio de clima atribuido directa o "
-                    "indirectamente a la actividad humana, distinguiéndose de la mera variabilidad climática natural. Fuente: Wikipedia y "
-                    "cambioclimatico.gov.co\n"
-                    "El cambio climático está intensificando los periodos de sequía y lluvia a nivel global. Las sequías actuales son más "
-                    "frecuentes, extensas y prolongadas, mientras que los periodos lluviosos muestran precipitaciones más extremas e irregulares. "
-                    "El aumento de temperaturas incrementa la evaporación del suelo y la evapotranspiración de las plantas, disminuyendo el agua "
-                    "disponible y agravando la aridificación de los climas. En consecuencia, los años húmedos son menos húmedos y los secos son "
-                    "mucho más secos.\n"
-                    "Las zonas ubicadas en el ecuador y los trópicos experimentan con mayor rapidez y severidad los efectos del cambio climático. "
-                    "Por ejemplo, en Ecuador y países tropicales, se observan cambios notorios en los patrones de precipitación: hay una alternancia "
-                    "entre sequías intensas y lluvias torrenciales, lo que da lugar a deslizamientos de tierra, alteraciones en la agricultura y "
-                    "pérdida significativa de cultivos. Además, los eventos extremos como El Niño y La Niña, influidos por el calentamiento global, "
-                    "modifican las temporadas tradicionales de lluvias y sequías, volviéndolas más impredecibles y acentuando sus impactos sociales "
-                    "y ecológicos. Fuente: https://www.wwfca.org/nuestrotrabajo/clima_energia/impacto_cambio_climatico_latinoamerica , "
-                    "https://www.agenciasinc.es/Noticias/Las-areas-tropicales-sufriran-antes-los-efectos-del-cambio-climatico\n"
-                    "El cambio climático altera la duración, intensidad y periodicidad de las temporadas de lluvia y sequía. En muchas regiones "
-                    "ecuatoriales y tropicales, las lluvias intensas pueden concentrarse en periodos más cortos y las sequías prolongarse, generando "
-                    "desafíos para la gestión del agua y la seguridad alimentaria. Estas modificaciones pueden afectar de manera directa a sectores "
-                    "vulnerables como la agricultura, la biodiversidad y las poblaciones rurales, incrementando los riesgos de desastres naturales y "
-                    "desplazamientos humanos.\n\n"
-                    "EFECTOS E IMPACTOS DE LAS SEQUÍAS\n"
-                    "- Deshidratación poblacional, animal y vegetal: impacto en población, cultivos y ganado.\n"
-                    "- Impacto directo en abastecimiento alimentario por afectación de cultivos.\n"
-                    "- Incendios forestales por baja humedad y resequedad del suelo más radiación solar fuerte y temperaturas altas.\n"
-                    "- Escasez de agua en fuentes hídricas: desabastecimiento de acueductos y pozos, afectación de higiene y saneamiento, aumento del uso de agua no potable "
-                    "y aparición de enfermedades en personas y animales (gastrointestinales, dérmicas, desnutrición, especialmente en NNA).\n"
-                    "- Bajísima humedad y altas temperaturas: golpes de calor, insolación, deshidratación severa, afectación a personas con condiciones de salud previas.\n"
-                    "Desplazamiento por sequías: La falta de agua para consumo y agricultura lleva a la migración temporal o permanente, especialmente en áreas rurales y zonas "
-                    "áridas. Las sequías, exacerbadas por el cambio climático, afectan la disponibilidad de agua, la producción agrícola y la seguridad alimentaria, lo que puede "
-                    "forzar a las personas a abandonar sus hogares en busca de mejores condiciones de vida. Según el IDMC, en 2022 se registraron 31,8 millones de desplazamientos "
-                    "internos por fenómenos meteorológicos extremos a nivel global. Las sequías fueron la tercera causa principal, tras inundaciones y tormentas.\n\n"
-                    "SOBRE NUESTROS INDICADORES Y DATOS\n"
-                    "Índice Estandarizado de Precipitación y Evapotranspiración (SPEI): propuesto por Vicente-Serrano et al. (2010) como índice de sequía mejorado. "
-                    "Utiliza el balance hídrico climático (precipitación menos evapotranspiración de referencia), en distintas escalas de tiempo, proporcionando una medida "
-                    "robusta de la gravedad de la sequía.\n"
-                    "Cálculo SPEI: Los valores de P - ETo se ajustan a una distribución de probabilidad para transformarlos a unidades estandarizadas. Se recomienda la "
-                    "distribución Loglogística (Vicente-Serrano et al., 2010), adecuada para diferentes escalas y climas. Luego se normalizan los datos.\n\n"
-                    "DIFERENCIAS ENTRE INDICADORES E ÍNDICES\n"
-                    "Indicadores: variables usadas para describir condiciones de sequía (precipitación, temperatura, humedad del suelo, caudal de ríos, niveles de agua subterránea, etc.).\n"
-                    "Índices: representaciones numéricas de la severidad de la sequía construidas a partir de indicadores (como SPEI), que simplifican relaciones complejas y permiten "
-                    "evaluar intensidad, ubicación, tiempo y duración.\n\n"
-                    "IMPORTANCIA DE ESTA INFORMACIÓN\n"
-                    "Comprender cómo el cambio climático altera sequías y lluvias es clave para la gestión sostenible del agua, la planificación agrícola, el diseño de infraestructuras "
-                    "resilientes y la formulación de políticas públicas. La anticipación y monitoreo permiten reducir pérdidas humanas, económicas y ecológicas, especialmente en zonas "
-                    "vulnerables del ecuador y el trópico.\n\n"
-                    "Eres un experto en climatología y prevención de desastres naturales del Instituto de Hidrología, Meteorología y Estudios Ambientales de Colombia, pero también experto en divulgación científica y ciencia ciudadana, con mucha experiencia para compartir con funcionarios gubernamentales y población civil información que puede resultar compleja, haciéndola accesible para este público, pero que procura ceñirse a la información científica verificable y evitando a toda costa recaer en la desinformación o especulación. Toma la información contextual suministrada a continuación para extraer y aprovechar el contenido, estableciendo relaciones conceptuales, contextuales y con los datos suministrados para responder de manera clara, eficiente, accesible y completa. Busca siempre primero la respuesta a la pregunta dentro de la información ya suministrada, y como último recurso en caso de no encontrar nada relacionado, sólo entonces haz una búsqueda web muy puntual y toma la fuente más fiable de información desde una perspectiva científica para responder, complementando la información que ya se tenía y retroalimentándola para volver a la información inicial y su importancia.\n\n"
                     f"Contexto del dashboard:\n{contexto_basico}\n\n"
                     f"Pregunta del usuario:\n{user_input}"
                 )
@@ -418,7 +363,6 @@ with chat_col:
                     contents=prompt,
                 )
                 reply_text = (response.text or "").strip()
-
             except Exception as e:
                 reply_text = (
                     f"No pude obtener respuesta de Gemini. "
@@ -440,10 +384,108 @@ with chat_col:
                     st.markdown(f"🤖 **Asistente:** {msg['content']}")
 
 # =========================
-# 4) ANALISIS DE SEQUIAS ( ERA5 / SPI/ SPEI)
+# 4) Sección  de analisis de tendencias de sequias
 # =========================
 
-# Lo de aqui se movio para arriba junto al chat bot
+st.markdown("---")
+st.header("Análisis de tendencias de sequias (Mann-Kendall)")
+
+if all(col in df.columns for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_1', 'SPEI_3', 'SPEI_6', 'SPEI_12']):
+    trend_data = []
+    for col in ['SPI_1', 'SPI_3', 'SPI_6', 'SPI_12', 'SPEI_1', 'SPEI_3', 'SPEI_6', 'SPEI_12']:
+        series= df[col].dropna()
+        if not series.empty:
+            result = mk.original_test(series)
+            trend_data.append({
+                'Index':col,
+                'Slope': result.slope,
+                'P_Value': result.p,
+                'Trend': result.trend,
+                'Significant': result.p < 0.05
+            })
+
+    trend_df = pd.DataFrame(trend_data)
+
+    st.subheader("Resultados de tendencia Mann-Kendall")
+    st.dataframe(trend_df, use_container_width=True)
+
+# Gráfica principal SPEI_12 con linea de tendencia
+
+    slope_spei12_from_df = trend_df[trend_df['Index'] == 'SPEI_12']['Slope'].iloc[0]
+    numeric_index_for_slope = np.arange(len(df['SPEI_12']))
+    first_spei12_value_in_series = df['SPEI_12'].iloc[0]
+    trend_line_y = first_spei12_value_in_series + slope_spei12_from_df * (numeric_index_for_slope - numeric_index_for_slope[0])
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df["valid_time"], y=df['SPEI_12'],
+                             mode='lines', name='SPEI (k=12 meses)'))
+    fig.add_trace(go.Scatter(x=df["valid_time"], y=trend_line_y,
+                             mode='lines', name='Tendencia Mann-Kendall',
+                             line=dict(color='red', dash='dash')))
+    fig.update_layout(
+    title='SPEI_12 con Línea de Tendencia Mann-Kendall',
+        xaxis_title='Año',
+        yaxis_title='Valor de SPEI (k=12 meses)',
+        hovermode='x unified'
+    )
+
+    fig.update_xaxes(rangeslider_visible=True)
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+#Gráfica de eventos históricos
+
+    st.subheader("📅 Contexto histórico y observacional de sequías en La Guajira")
+
+    st.markdown("""
+    Además del análisis climático cuantitativo con datos ERA5, se recopilaron reportes de prensa y boletines institucionales
+    que reflejan los impactos sociales y ambientales de las sequías recientes en La Guajira.  
+    Estos eventos permiten validar el comportamiento observado en los índices de sequía y comprender mejor las afectaciones locales.
+    """)
+
+    st.markdown("""
+    | Fecha | Evento reportado | Fuente / Observación |
+    |--------|------------------|----------------------|
+    | **5 de junio de 2025** | Temporada de lluvias irregular, lluvias por debajo del promedio. | *Periódicos locales (Cambio Climático)* |
+    | **1 de junio – 30 de noviembre (2025)** | Temporada de ciclones tropicales que incrementa la variabilidad climática. | *Servicio Meteorológico Nacional* |
+    | **1er semestre de 2024** | Fenómeno del Niño afectó a más de 5.500 familias en varios municipios. | *OCHA* |
+    | **Febrero de 2021** | Río Tapias presentó 1.300 L/s menos de su caudal normal. | *Periódicos regionales* |
+    | **Enero de 2020** | Calamidad pública en Hatonuevo por escasez de agua. | *Noticias locales* |
+    | **Febrero de 2019** | Disminución del nivel del río Tapia en más del 50%. | *Prensa regional* |
+    | **2014** | Año de sequía extrema con afectaciones prolongadas. | *Archivo de prensa nacional* |
+    """)
+
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(x=df["valid_time"], y=df['SPEI_12'],
+                              mode='lines', name='SPEI (k=12 meses)'))
+    fig2.add_trace(go.Scatter(x=df["valid_time"], y=trend_line_y,
+                              mode='lines', name='Tendencia (Mann-Kendall)',
+                              line=dict(color='red', dash='dash')))
+
+    # Marcar eventos importantes
+    fig2.add_vline(x=pd.to_datetime('2021-02'), line_dash="dot", line_color="red")
+    fig2.add_vline(x=pd.to_datetime('2020-01'), line_dash="dot", line_color="red")
+    fig2.add_vline(x=pd.to_datetime('2019-02'), line_dash="dot", line_color="red")
+
+    fig2.update_layout(
+        title='Eventos históricos y tendencia de sequía (SPEI_12)',
+        xaxis_title='Año',
+        yaxis_title='SPEI (k=12 meses)',
+        hovermode='x unified'
+    )
+    fig2.update_xaxes(rangeslider_visible=True)
+    st.plotly_chart(fig2, use_container_width=True)
+
+    st.markdown("""
+    ### 🔍 Observaciones clave:
+    - Los registros confirman una **recurrencia de eventos de sequía severa cada 3–5 años**, con picos asociados al **Fenómeno del Niño**.  
+    - El **déficit hídrico del río Tapias** es un indicador crítico para Riohacha y comunidades Wayúu.  
+    - Los impactos sociales (escasez de agua, pérdida de ganado) concuerdan con las **anomalías de precipitación y temperatura** observadas.  
+    - Desde 2020 se observa **mayor irregularidad estacional**, probablemente vinculada al cambio climático global.
+    """)
+else:
+    st.info("⚠️ Aún no se han calculado los índices SPI/SPEI necesarios para el análisis de tendencias.")
 
 # =========================
 # 5) BUZÓN DE REPORTES
@@ -473,5 +515,3 @@ with st.form("form_reporte"):
                 writer.writerow([datetime.now().isoformat(), nombre, municipio, mensaje])
 
             st.success("¡Gracias por tu reporte! Se ha enviado correctamente.")
-
-
