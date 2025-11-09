@@ -22,7 +22,7 @@ st.set_page_config(
 def load_data():
     df = pd.read_parquet("dataset_clima.parquet")
 
-    # Asegurar columna de tiempo
+        # Asegurar columna de tiempo
     if "valid_time" in df.columns:
         df["valid_time"] = pd.to_datetime(df["valid_time"])
         df["date"] = df["valid_time"]
@@ -36,14 +36,14 @@ def load_data():
     if "year" not in df.columns:
         df["year"] = df["date"].dt.year
 
-    # Asegurar precipitacion_total
-    if "precipitacion_total" not in df.columns:
-        st.error("No se encontró la columna 'precipitacion_total' en el dataset.")
+    # Asegurar tp
+    if "tp" not in df.columns:
+        st.error("No se encontró la columna 'tp' (Precipitacion_total) en el dataset.")
         st.stop()
 
-    # Serie mensual agregada (ej: promedio espacial de precipitacion_total)
+    # Serie mensual agregada (ej: promedio espacial de tp)
     monthly = (
-        df.groupby(pd.Grouper(key="date", freq="MS"))["precipitacion_total"]
+        df.groupby(pd.Grouper(key="date", freq="MS"))["tp"]
         .mean()
         .reset_index()
         .sort_values("date")
@@ -92,13 +92,14 @@ last_date = last_12["date"].max()
 next_month_date = last_date + pd.DateOffset(months=1)
 
 # Predicción dummy: promedio últimos 12 meses
-pred_prec = float(last_12["precipitacion_total"].mean())
+pred_prec = float(last_12["tp"].mean())
 
 last_12["is_pred"] = 0
 pred_row = pd.DataFrame(
-    {"date": [next_month_date], "precipitacion_total": [pred_prec], "is_pred": [1]}
+    {"date": [next_month_date], "tp": [pred_prec], "is_pred": [1]}
 )
 plot_df = pd.concat([last_12, pred_row], ignore_index=True)
+
 
 # Bandas de colores (ajusta umbrales según tu lógica)
 bands = pd.DataFrame([
@@ -137,13 +138,13 @@ line_chart = (
                 tickCount=13,
             ),
         ),
-        y=alt.Y("precipitacion_total:Q", title="precipitacion_total"),
+        y=alt.Y("tp:Q", title="tp (mm/mes)"),
         color=alt.condition(
             "datum.is_pred == 1",
             alt.value("#F44336"),   # predicción
             alt.value("#00d492"),   # histórico
         ),
-        tooltip=["date:T", "precipitacion_total:Q"],
+        tooltip=["date:T", "tp:Q"],
     )
 )
 
@@ -152,11 +153,12 @@ pred_points = (
     .mark_point(size=80, filled=True)
     .encode(
         x="date:T",
-        y="precipitacion_total:Q",
+        y="tp:Q",
         color=alt.value("#F44336"),
-        tooltip=["date:T", "precipitacion_total:Q"],
+        tooltip=["date:T", "tp:Q"],
     )
 )
+
 
 st.subheader("Últimos 12 meses de 'precipitacion_total' + proyección al siguiente mes")
 st.altair_chart(band_chart + line_chart + pred_points, width="stretch")
@@ -471,4 +473,5 @@ with st.form("form_reporte"):
                 writer.writerow([datetime.now().isoformat(), nombre, municipio, mensaje])
 
             st.success("¡Gracias por tu reporte! Se ha enviado correctamente.")
+
 
