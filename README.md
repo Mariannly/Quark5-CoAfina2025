@@ -106,11 +106,13 @@ S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en 
   - **Sobre prevención y gestión del riesgo:**  
     _“¿Qué acciones deberían tomar las autoridades locales si aumenta la probabilidad de sequía?”_
   - **Sobre cambio climático:**  
-    _“¿Cómo influye el cambio climático en la duración y frecuencia de las sequías en regiones como La Guajira?”_
+    _“¿Cómo influye el cambio climático en la duración y frecuencia de las sequías en regiones como La Guajira?”_ 
   - **Sobre impactos sociales y ecológicos:**  
     _“¿Qué consecuencias puede tener una sequía prolongada en los ecosistemas y comunidades rurales?”_
   - **Sobre interpretación de datos y visualizaciones:**  
     _“¿Cómo se interpreta la tendencia negativa en la gráfica Mann–Kendall?”_
+  - **Líneas locales de reporte de emergencias y atención frente a desastres**
+    _“¿A dónde debo llamar para reportar un incendio activo?”_
 
 ---
 
