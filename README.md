@@ -64,6 +64,8 @@ S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en 
 
 
 S-ARIDA  © 2025 by Quark5 is licensed under CC BY 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/
+
+
 ---
 
 ## 🌞 Cita recomendada
