@@ -31,7 +31,7 @@ st.set_page_config(
 
 st.markdown(
     """
-   # ** Bienvenido al Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales (S-ARIDA)**  
+   # **Bienvenido al Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales (S-ARIDA)**  
 
     Una herramienta que convierte datos climáticos en conocimiento útil para enfrentar las sequías e incendios en La Guajira.  
 

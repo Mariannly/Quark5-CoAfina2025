@@ -13,6 +13,10 @@
 
 Este proyecto de ciencia al servicio de la ciudadanía busca fortalecer la capacidad de **prevención y gestión del riesgo climático** en una de las regiones más afectadas por la aridez y el cambio climático en Colombia: La Guajira.
 
+YouTube: https://youtu.be/4Pf9hkQNCAI
+Dashboard: https://s-arida.streamlit.app/
+
+
 ---
 
 ## 🎯 Objetivos
@@ -41,14 +45,8 @@ S-ARIDA/
 
 ## ⚙️ Requisitos
 
-Para ejecutar el proyecto localmente:
+Leer requirements.txt y requirements_dashboard.txt para instalar las librerías necesarias.
 
-```bash
-git clone https://github.com/Mariannly/Quark5-CoAfina2025.git
-cd Quark5-CoAfina2025
-pip install -r requirements.txt
-```
----
 
 ## 🧠 Equipo
 
@@ -64,9 +62,8 @@ S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en 
 
 ## 📚 Licencia
 
-Este proyecto está licenciado bajo los términos de ----- License.
-Puedes usarlo y adaptarlo libremente citando la fuente original.
 
+S-ARIDA  © 2025 by Quark5 is licensed under CC BY 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/
 ---
 
 ## 🌞 Cita recomendada
