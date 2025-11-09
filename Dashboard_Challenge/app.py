@@ -260,7 +260,7 @@ monthly_probs = load_modelo_probs()
 
 st.markdown("---")
 st.markdown("---")
-st.header("\n**Probabilidad de sequía estimada por el modelo**")
+st.header("\n**Probabilidad de sequía estimada**")
 
 if monthly_probs is not None and not monthly_probs.empty:
     df_disp = monthly_probs.copy()
