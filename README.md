@@ -43,7 +43,7 @@ S-ARIDA/
 
 ## 🧠 Equipo
 
-S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos  y trabajadores sociales.
+S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos e investigadores sociales.
 
 👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo  
 👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico  
