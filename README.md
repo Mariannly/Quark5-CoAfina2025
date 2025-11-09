@@ -41,13 +41,6 @@ S-ARIDA/
 ├── README.md   
 └── requirements.txt  
 
----
-
-## ⚙️ Requisitos
-
-Leer requirements.txt y requirements_dashboard.txt para instalar las librerías necesarias.
-
-
 ## 🧠 Equipo
 
 S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos  y trabajadores sociales.
@@ -144,6 +137,12 @@ S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en 
 - Toda la información se muestra a través de **visualizaciones interactivas, dashboards y endpoints de API.**
 - El sistema está diseñado para que **funcionarios, técnicos y ciudadanos** puedan explorar y comprender los datos sin necesidad de conocimientos avanzados.
 - Promueve la **transparencia, el acceso al conocimiento científico y la toma de decisiones informadas.**
+
+---
+
+## ⚙️ Requisitos
+
+Leer requirements.txt y requirements_dashboard.txt para instalar las librerías necesarias.
 
 
 ## 📚 Licencia
