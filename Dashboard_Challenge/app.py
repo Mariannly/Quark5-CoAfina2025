@@ -143,6 +143,100 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
+# Helper: descarga archivos si no existen, soporta URL HTTP(S) y S3 con boto3 (si config en Secrets)
+def download_http(url: str, dest_path: str) -> bool:
+    try:
+        dest = Path(dest_path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with requests.get(url, stream=True, timeout=60) as r:
+            r.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+        return True
+    except Exception as e:
+        st.error(f"Error descargando {url}: {e}")
+        return False
+
+def download_from_s3(bucket: str, key: str, dest_path: str, aws_access_key=None, aws_secret_key=None, region_name=None) -> bool:
+    try:
+        import boto3
+        session_kwargs = {}
+        if aws_access_key and aws_secret_key:
+            session_kwargs = dict(
+                aws_access_key_id=aws_access_key,
+                aws_secret_access_key=aws_secret_key,
+                region_name=region_name,
+            )
+        s3 = boto3.client("s3", **session_kwargs)
+        dest = Path(dest_path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        s3.download_file(bucket, key, str(dest))
+        return True
+    except Exception as e:
+        st.error(f"Error descargando s3://{bucket}/{key}: {e}")
+        return False
+
+def ensure_asset(local_path: str, secret_key_url: str=None, s3_bucket_secret: str=None, s3_key_secret: str=None) -> bool:
+    """
+    - local_path: ruta dentro del contenedor (ej. 'modelo_sequia_hgb.pkl')
+    - secret_key_url: nombre de la secret que contiene URL HTTP(S) (ej. 'MODEL_URL')
+    - s3_bucket_secret / s3_key_secret: nombres de secrets para S3 (ej. 'S3_BUCKET', 'MODEL_KEY')
+    """
+    if Path(local_path).exists():
+        return True
+
+    # 1) Si existe secret con HTTP URL -> descargar por HTTP
+    if secret_key_url:
+        url = None
+        try:
+            url = st.secrets.get(secret_key_url) if secret_key_url in st.secrets else None
+        except Exception:
+            url = None
+        if url:
+            st.info(f"Descargando {local_path} desde URL configurada en secret {secret_key_url}...")
+            return download_http(url, local_path)
+
+    # 2) Si tenemos S3 secrets configuradas -> descargar con boto3
+    try:
+        s3_bucket = st.secrets.get(s3_bucket_secret) if s3_bucket_secret and s3_bucket_secret in st.secrets else None
+        s3_key = st.secrets.get(s3_key_secret) if s3_key_secret and s3_key_secret in st.secrets else None
+    except Exception:
+        s3_bucket = s3_key = None
+
+    if s3_bucket and s3_key:
+        st.info(f"Descargando {local_path} desde S3 {s3_bucket}/{s3_key} usando credenciales en Secrets...")
+        aws_key = st.secrets.get("AWS_ACCESS_KEY_ID") if "AWS_ACCESS_KEY_ID" in st.secrets else None
+        aws_secret = st.secrets.get("AWS_SECRET_ACCESS_KEY") if "AWS_SECRET_ACCESS_KEY" in st.secrets else None
+        aws_region = st.secrets.get("AWS_REGION") if "AWS_REGION" in st.secrets else None
+        return download_from_s3(s3_bucket, s3_key, local_path, aws_key, aws_secret, aws_region)
+
+    # No se pudo descargar porque no hay secrets configuradas
+    st.warning(f"No se encontró '{local_path}' localmente y no se configuró una URL o S3 en Secrets para descargarlo.")
+    return False
+
+# ======= Uso: antes de llamar load_data/load_model en la app ========
+# Intenta descargar dataset/model si faltan con nombres de secrets esperados
+# Ajusta los nombres de secrets según como los guardes en Streamlit Cloud.
+
+# dataset
+_ = ensure_asset(
+    local_path="dataset_clima.parquet",
+    secret_key_url="DATASET_URL",
+    s3_bucket_secret="S3_BUCKET",
+    s3_key_secret="DATASET_KEY",
+)
+
+# modelo
+_ = ensure_asset(
+    local_path="modelo_sequia_hgb.pkl",
+    secret_key_url="MODEL_URL",
+    s3_bucket_secret="S3_BUCKET",
+    s3_key_secret="MODEL_KEY",
+)
+
 # =========================
 # CARGA Y PREPARACIÓN DE DATOS
 # =========================
