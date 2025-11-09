@@ -56,7 +56,7 @@ S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en 
 👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico  
 👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard  
 👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard  
-👨‍💻 [Andre Avila] —  Divulgación científica y comunicación / Comunicación visual y Ciencia Ciudadana 
+👨‍💻 [Andre Avila] —  Divulgación científica y comunicación / Prompt Design y Ciencia Ciudadana 
 
 ---
 
