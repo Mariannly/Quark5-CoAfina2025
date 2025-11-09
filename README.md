@@ -26,16 +26,16 @@ Este proyecto de ciencia al servicio de la ciudadanía busca fortalecer la capac
 
 ## 🧩 Estructura del repositorio
 
-S-ARIDA/
-│
-├── 📁 Análisis Histórico
-│ ├── 01 Análisis_histórico_Riohacha.ipynb
-├── 📁 Modelo Predictivo
-│ └── 01_modelo_predicción.ipynb
-├── 📁 Dashboard
-│
-├── README.md 
-└── requirements.txt
+S-ARIDA/  
+│  
+├── 📁 Análisis Histórico  
+│ ├── 01 Análisis_histórico_Riohacha.ipynb  
+├── 📁 Modelo Predictivo  
+│ └── 01_modelo_predicción.ipynb  
+├── 📁 Dashboard  
+│  
+├── README.md   
+└── requirements.txt  
 
 ---
 
@@ -44,7 +44,7 @@ S-ARIDA/
 Para ejecutar el proyecto localmente:
 
 ```bash
-git clone https://github.com/<usuario>/S-ARIDA.git
+git clone https://github.com/Mariannly/Quark5-CoAfina2025.git
 cd S-ARIDA
 pip install -r requirements.txt
 ```
