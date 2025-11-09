@@ -29,6 +29,16 @@ st.set_page_config(
 
 st.markdown(
     """
+   # ** Bienvenido al Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales (S-ARIDA)**  
+
+    Una herramienta que convierte datos climáticos en conocimiento útil para enfrentar las sequías e incendios en La Guajira.  
+
+    Aquí podrás explorar visualizaciones intuitivas, conocer proyecciones sobre el riesgo climático y conversar con un asistente inteligente que explica, de forma clara y sencilla, lo que muestran los datos para apoyar la prevención y el cuidado del territorio.
+    """
+)
+
+st.markdown(
+    """
     <style>
     /* Expanders como tarjetas internas con fondo de widget */
     details.st-expander, div.stExpander {
@@ -242,22 +252,7 @@ _ = ensure_asset(
 # =========================
 @st.cache_data
 def load_data():
-
-    path="dataset_clima.parquet"
-
-    if not os.path.exists(path):
-        st.warning(
-            f"El dataset '{path}' no está disponible en el servidor. "
-            "Puedes subirlo a la carpeta Dashboard_Challenge en el repo, usar Git LFS o configurar una URL de descarga."
-        )
-        # Retornar valores vacíos o None para que la app pueda manejar la ausencia
-        return None, None
-
-    try:
-        df = pd.read_parquet(path)
-    except Exception as e:
-        st.error(f"No se pudo leer '{path}'. Detalle: {e}")
-        return None, None
+    df = pd.read_parquet("dataset_clima.parquet")
 
     # Asegurar columna de tiempo homogénea
     if "valid_time" in df.columns:
@@ -321,15 +316,11 @@ def load_modelo_probs():
 
 @st.cache_resource
 def load_model():
-    path="modelo_sequia_hgb.pkl"
-    if not os.path.exists(path):
-        st.info(f"El archivo de modelo '{path}' no fue encontrado. La funcionalidad de predicción estará deshabilitada.")
-        return None
     try:
-        model = joblib.load(path)
+        model = joblib.load("modelo_sequia_hgb.pkl")
         return model
     except Exception as e:
-        st.error(f"No se pudo cargar el modelo de sequía desde '{path}'. Detalle: {e}")
+        st.error(f"No se pudo cargar el modelo de sequía desde 'modelo_sequia_hgb.pkl'. Detalle: {e}")
         return None
 
 model = load_model()
