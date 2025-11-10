@@ -2,7 +2,7 @@
 ### *Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales*
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
-[![Licencia: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Licencia: CC BY 4.0](https://img.shields.io/badge/License-CC-BY-4.0-yellow.svg)](LICENSE)
 [![Hecho con ❤️ en Colombia](https://img.shields.io/badge/Hecho%20con%20❤️%20en-Colombia-yellow)]()
 
 ---
