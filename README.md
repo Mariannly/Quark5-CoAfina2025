@@ -33,10 +33,11 @@ Dashboard: https://s-arida.streamlit.app/
 S-ARIDA/  
 │  
 ├── 📁 Análisis Histórico  
-│ ├── 01 Análisis_histórico_Riohacha.ipynb  
+│ └── 01 Análisis_histórico_Riohacha.ipynb  
 ├── 📁 Modelo Predictivo  
-│ └── 01_modelo_predicción.ipynb  
-├── 📁 Dashboard  
+│ └── 01 modelo_predictivo.ipynb  
+├── 📁 Dashboard
+│ └── app.py  
 │  
 ├── README.md   
 └── requirements.txt  
