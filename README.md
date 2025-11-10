@@ -36,7 +36,7 @@ S-ARIDA/
 │ └── 01 Análisis_histórico_Riohacha.ipynb  
 ├── 📁 Modelo Predictivo  
 │ └── 01 modelo_predictivo.ipynb  
-├── 📁 Dashboard
+├── 📁 Dashboard  
 │ └── app.py  
 │  
 ├── README.md   
@@ -47,7 +47,7 @@ S-ARIDA/
 S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos e investigadores sociales.
 
 👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard  
-👨‍💻 [Andre Avila] —  Divulgación Científica / Comunicación / Prompt Design / Ciencia Ciudadana 
+👨‍💻 [Andre Avila] —  Divulgación Científica / Comunicación / Prompt Design / Ciencia Ciudadana   
 👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard  
 👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo  
 👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico  
