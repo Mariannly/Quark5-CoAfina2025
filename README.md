@@ -2,7 +2,7 @@
 ### *Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales*
 
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
-[![Licencia: CC BY 4.0](https://img.shields.io/badge/License-CC-BY-4.0-yellow.svg)](LICENSE)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Hecho con ❤️ en Colombia](https://img.shields.io/badge/Hecho%20con%20❤️%20en-Colombia-yellow)]()
 
 ---
@@ -13,7 +13,7 @@
 
 Este proyecto de ciencia al servicio de la ciudadanía busca fortalecer la capacidad de **prevención y gestión del riesgo climático** en una de las regiones más afectadas por la aridez y el cambio climático en Colombia: La Guajira.
 
-YouTube: https://youtu.be/4Pf9hkQNCAI
+YouTube: https://youtu.be/4Pf9hkQNCAI  
 Dashboard: https://s-arida.streamlit.app/
 
 
@@ -45,11 +45,14 @@ S-ARIDA/
 
 S-ARIDA fue realizado por Quark5, un equipo multidisciplinario de ingenieros en sistemas, físicos e investigadores sociales.
 
+👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard  
+👨‍💻 [Andre Avila] —  Divulgación Científica / Comunicación / Prompt Design / Ciencia Ciudadana 
+👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard  
 👩‍💻 [Jhon Almanzar] — Machine Learning / Modelado Predictivo  
 👩‍💻 [Mariannly Marquez] — Ciencia de Datos / Análisis Hístorico  
-👩‍💻 [Alexa Serrano] — Diseño UI/UX / Dashboard  
-👨‍💻 [Cristian Orduz] — Diseño UI/UX / Dashboard  
-👨‍💻 [Andre Avila] —  Divulgación científica y comunicación / Prompt Design y Ciencia Ciudadana 
+
+
+
 
 ---
 
@@ -155,4 +158,4 @@ S-ARIDA  © 2025 by Quark5 is licensed under CC BY 4.0. To view a copy of this l
 
 ## 🌞 Cita recomendada
 
-“S-ARIDA: Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales. Proyecto de análisis climático para Riohacha basado en datos ERA5 y aprendizaje automático.”
+“ Alexa Serrano, Andre Avila, Cristian Orduz, Jhon Almanzar y Mariannly Marquez (2025). S-ARIDA: Sistema de Alerta y Riesgo por Incidencia de Sequías y Desastres Ambientales. Proyecto de análisis climático para Riohacha basado en datos ERA5 y aprendizaje automático.”
