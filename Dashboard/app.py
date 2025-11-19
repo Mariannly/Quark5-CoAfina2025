@@ -697,7 +697,6 @@ with tab2:
         yaxis_title="Precipitación y Evaporación Total (mm/mes)",
         hovermode="x unified"
     )
-
     # Gráfico 2: SPI
     fig2 = go.Figure()
     fig2.update_layout(colorway=PALETTE["colors"])
@@ -849,7 +848,7 @@ with tab2:
             xaxis_title="Año",
             yaxis_title="SPEI (k=12 meses)",
             hovermode="x unified",
-            colorway=PALETTE["colors"],
+            colorway=["#3DA5D9"],
         )
         fig_hist.update_xaxes(rangeslider_visible=True)
 

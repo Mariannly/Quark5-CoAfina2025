@@ -3,7 +3,7 @@ base = "light"
 
 # General color setup
 textColor = "#1c1919"
-primaryColor = "#00d492"
+primaryColor = "#EB6D1E"
 backgroundColor = "#fafafa"
 secondaryBackgroundColor = "#ffffff"
 
