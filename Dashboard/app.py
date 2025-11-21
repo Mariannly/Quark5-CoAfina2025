@@ -848,7 +848,7 @@ with tab2:
             xaxis_title="Año",
             yaxis_title="SPEI (k=12 meses)",
             hovermode="x unified",
-            colorway=["#3DA5D9"],
+            colorway=["#17758C"],
         )
         fig_hist.update_xaxes(rangeslider_visible=True)
 
