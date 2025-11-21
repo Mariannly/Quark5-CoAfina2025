@@ -15,9 +15,9 @@ import requests
 
 # COLORES
 PALETTE = {
-    "colors": ["#5F0F40", "#9A031E", "#FB8B24", "#E36414", "#0F4C5C"],
-    "widget_bg": "#FDEBD8",
-    "text": "#030F12",
+    "colors": ["#7C1354", "#B40424", "#FB9637", "#EB6D1E", "#14667B"],
+    "widget_bg": "#AEC3AC",
+    "text": "#061D23",
 }
 
 # =========================
