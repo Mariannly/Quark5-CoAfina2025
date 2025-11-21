@@ -15,7 +15,7 @@ import requests
 
 # COLORES
 PALETTE = {
-    "colors": ["#7C1354", "#B40424", "#FB9637", "#EB6D1E", "#14667B"],
+    "colors": ["#EB6D1E", "#14667B", "#7C1354", "#FB9637", "#B40424"],
     "widget_bg": "#AEC3AC",
     "text": "#061D23",
 }
@@ -539,7 +539,7 @@ with tab1:
                         }
                     ]
 
-                user_input = st.chat_input("Escribe tu pregunta sobre el clima o las sequías...")
+                user_input = st.chat_input("Escribe tu pregunta aquí")
 
                 if user_input:
                     st.session_state.chat_messages.append(
